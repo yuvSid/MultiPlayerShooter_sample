@@ -7,11 +7,14 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/Pawn.h"
 #include "Engine/Engine.h"
+#include "Engine/World.h"
 #include "Components/InputComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Camera/CameraComponent.h"
+
+#include "DefaultBullet.h"
 
 #include "DefaultCharacterFPS.generated.h"
 
@@ -58,4 +61,16 @@ public:
 	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY( VisibleDefaultsOnly, Category = Mesh )
 	USkeletalMeshComponent* FirstPersonMesh;
+
+	// Function that handles firing bullets.
+	UFUNCTION()
+	void Fire();
+
+	// Gun muzzle's offset from the camera location.
+	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = Gameplay )
+	FVector MuzzleOffset;
+
+	// Bullet class to spawn.
+	UPROPERTY( EditDefaultsOnly, Category = Bullets )
+	TSubclassOf<class ADefaultBullet> BulletClass;
 };

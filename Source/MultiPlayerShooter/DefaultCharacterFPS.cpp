@@ -71,6 +71,8 @@ void ADefaultCharacterFPS::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	// Set up "action" bindings.
 	PlayerInputComponent->BindAction( "Jump", IE_Pressed, this, &ADefaultCharacterFPS::StartJump );
 	PlayerInputComponent->BindAction( "Jump", IE_Released, this, &ADefaultCharacterFPS::StopJump );
+
+	PlayerInputComponent->BindAction( "Fire", IE_Pressed, this, &ADefaultCharacterFPS::Fire );
 }
 
 void ADefaultCharacterFPS::MoveForward( float Value )
@@ -94,5 +96,38 @@ void ADefaultCharacterFPS::StartJump()
 void ADefaultCharacterFPS::StopJump()
 {
 	bPressedJump = false;
+}
+
+void ADefaultCharacterFPS::Fire()
+{
+	// Attempt to fire a Bullet.
+	if ( BulletClass )
+	{
+		// Get the camera transform.
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetActorEyesViewPoint( CameraLocation, CameraRotation );
+
+		// Transform MuzzleOffset from camera space to world space.
+		FVector MuzzleLocation = CameraLocation + FTransform( CameraRotation ).TransformVector( MuzzleOffset );
+		FRotator MuzzleRotation = CameraRotation;
+		// Skew the aim to be slightly upwards.
+		MuzzleRotation.Pitch += 10.0f;
+		UWorld* World = GetWorld();
+		if ( World )
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = Instigator;
+			// Spawn the bullet at the muzzle.
+			ADefaultBullet* Bullet = World->SpawnActor<ADefaultBullet>( BulletClass, MuzzleLocation, MuzzleRotation, SpawnParams );
+			if ( Bullet )
+			{
+				// Set the projectile's initial trajectory.
+				FVector LaunchDirection = MuzzleRotation.Vector();
+				Bullet->FireInDirection( LaunchDirection );
+			}
+		}
+	}
 }
 
