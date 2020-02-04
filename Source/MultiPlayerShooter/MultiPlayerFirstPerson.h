@@ -6,7 +6,6 @@
 #include "GameFramework/HUD.h"
 #include "Engine/Texture2D.h"
 #include "Engine/Canvas.h"
-//#include "Math/Vector2D.h"
 
 #include "MultiPlayerFirstPerson.generated.h"
 

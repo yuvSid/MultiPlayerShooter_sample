@@ -48,6 +48,10 @@ void ADefaultCharacterFPS::BeginPlay()
 	
 }
 
+void ADefaultCharacterFPS::OnRep_CurrentHealth()
+{
+}
+
 // Called every frame
 void ADefaultCharacterFPS::Tick(float DeltaTime)
 {
