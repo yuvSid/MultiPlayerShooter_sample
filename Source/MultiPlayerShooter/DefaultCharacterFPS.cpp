@@ -38,7 +38,9 @@ ADefaultCharacterFPS::ADefaultCharacterFPS()
 	FirstPersonMesh->bCastDynamicShadow = false;
 	FirstPersonMesh->CastShadow = false;
 
-	
+	//Initialize the player's Health
+	MaxHealth = 100.0f;
+	CurrentHealth = MaxHealth;	
 }
 
 // Called when the game starts or when spawned
@@ -50,6 +52,7 @@ void ADefaultCharacterFPS::BeginPlay()
 
 void ADefaultCharacterFPS::OnRep_CurrentHealth()
 {
+	OnHealthUpdate();
 }
 
 // Called every frame
@@ -100,6 +103,43 @@ void ADefaultCharacterFPS::StartJump()
 void ADefaultCharacterFPS::StopJump()
 {
 	bPressedJump = false;
+}
+
+// Replicated Properties
+void ADefaultCharacterFPS::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
+	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
+
+	//Replicate current health.
+	DOREPLIFETIME( AThirdPersonMPCharacter, CurrentHealth );
+}
+
+void ADefaultCharacterFPS::OnHealthUpdate()
+{
+	//Client-specific functionality
+	if ( IsLocallyControlled() )
+	{
+		FString healthMessage = FString::Printf( TEXT( "You now have %f health remaining." ), CurrentHealth );
+		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Blue, healthMessage );
+
+		if ( CurrentHealth <= 0 )
+		{
+			FString deathMessage = FString::Printf( TEXT( "You have been killed." ) );
+			GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Red, deathMessage );
+		}
+	}
+
+	//Server-specific functionality
+	if ( Role == ROLE_Authority )
+	{
+		FString healthMessage = FString::Printf( TEXT( "%s now has %f health remaining." ), *GetFName().ToString(), CurrentHealth );
+		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Blue, healthMessage );
+	}
+
+	//Functions that occur on all machines. 
+	/*
+		Any special functionality that should occur as a result of damage or death should be placed here.
+	*/
 }
 
 void ADefaultCharacterFPS::Fire()

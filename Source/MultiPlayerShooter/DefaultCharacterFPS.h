@@ -44,9 +44,15 @@ protected:
 	UFUNCTION()
 	void OnRep_CurrentHealth();
 
+	//Response to health being updated. Called on the server immediately after modification, and on clients in response to a RepNotify
+	void OnHealthUpdate();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Property replication
+	void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -66,6 +72,8 @@ public:
 	// Clears jump flag when key is released.
 	UFUNCTION()
 	void StopJump();
+
+	
 
 	// FPS camera.
 	UPROPERTY( VisibleAnywhere )
