@@ -2,6 +2,7 @@
 
 
 #include "DefaultCharacterFPS.h"
+#include "Math/UnrealMathUtility.h"
 
 // Sets default values
 ADefaultCharacterFPS::ADefaultCharacterFPS()
@@ -111,7 +112,7 @@ void ADefaultCharacterFPS::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
 
 	//Replicate current health.
-	DOREPLIFETIME( AThirdPersonMPCharacter, CurrentHealth );
+	DOREPLIFETIME( ADefaultCharacterFPS, CurrentHealth );
 }
 
 void ADefaultCharacterFPS::OnHealthUpdate()
@@ -173,5 +174,21 @@ void ADefaultCharacterFPS::Fire()
 			}
 		}
 	}
+}
+
+void ADefaultCharacterFPS::SetCurrentHealth( float healthValue )
+{
+	if ( Role == ROLE_Authority )
+	{
+		CurrentHealth = FMath::Clamp( healthValue, 0.f, MaxHealth );
+		OnHealthUpdate();
+	}
+}
+
+float ADefaultCharacterFPS::TakeDamage( float DamageTaken, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser )
+{
+	float damageApplied = CurrentHealth - DamageTaken;
+	SetCurrentHealth( damageApplied );
+	return damageApplied;
 }
 

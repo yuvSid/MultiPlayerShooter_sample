@@ -3,19 +3,26 @@
 
 #include "DefaultBullet.h"
 
+#include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+
+#include "Components/StaticMeshComponent.h"
+#include "GameFramework/DamageType.h"
+#include "Particles/ParticleSystem.h"
+#include "Kismet/GameplayStatics.h"
+//#include "UObject/ConstructorHelpers.h"
+
 // Sets default values
 ADefaultBullet::ADefaultBullet()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+	bReplicates = true;	
+	
 	// Use a sphere as a simple collision representation.
-	CollisionComponent = CreateDefaultSubobject<USphereComponent>( TEXT( "SphereComponent" ) );
-	CollisionComponent->BodyInstance.SetCollisionProfileName( TEXT( "Projectile" ) );
-	CollisionComponent->OnComponentHit.AddDynamic( this, &ADefaultBullet::OnHit );
-
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>( TEXT( "RootComponent" ) );
+	
 	// Set the sphere's collision radius.
-	CollisionComponent->InitSphereRadius( 15.0f );
+	CollisionComponent->InitSphereRadius( 15.0f ); //TODO add connection with blueprint scale
+	CollisionComponent->SetCollisionProfileName( TEXT( "BlockAllDynamic" ) );
 	// Set the root component to be the collision component.
 	RootComponent = CollisionComponent;
 
@@ -25,23 +32,13 @@ ADefaultBullet::ADefaultBullet()
 	ProjectileMovementComponent->InitialSpeed = 3000.0f;
 	ProjectileMovementComponent->MaxSpeed = 3000.0f; //TODO chnage for settable in editor parametrs 
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
+	ProjectileMovementComponent->ProjectileGravityScale = 0.01f;
 
 	// Die after 3 seconds.
 	InitialLifeSpan = 3.0f;
-}
 
-// Called when the game starts or when spawned
-void ADefaultBullet::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void ADefaultBullet::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	DamageType = UDamageType::StaticClass();
+	Damage = 10.0f;
 }
 
 // Function that initializes the projectile's velocity in the shoot direction.
@@ -50,13 +47,4 @@ void ADefaultBullet::FireInDirection( const FVector& ShootDirection )
 	ProjectileMovementComponent->Velocity = ShootDirection * ProjectileMovementComponent->InitialSpeed;
 }
 
-//TODO add collision with pawn
-// Function that is called when the projectile hits something.
-void ADefaultBullet::OnHit( UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit )
-{
-	if ( OtherActor != this && OtherComponent->IsSimulatingPhysics() )
-	{
-		OtherComponent->AddImpulseAtLocation( ProjectileMovementComponent->Velocity * 100.0f, Hit.ImpactPoint );
-	}
-}
 

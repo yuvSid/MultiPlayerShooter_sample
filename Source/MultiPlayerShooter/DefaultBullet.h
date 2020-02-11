@@ -1,11 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+// TODO change projectiles to rayCast bullet
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "GameFramework/ProjectileMovementComponent.h"
-#include "Components/SphereComponent.h"
 
 #include "DefaultBullet.generated.h"
 
@@ -19,26 +18,26 @@ public:
 	ADefaultBullet();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	// Sphere collision component.
 	UPROPERTY( VisibleDefaultsOnly, Category = Projectile )
-	USphereComponent* CollisionComponent;
+	class USphereComponent* CollisionComponent;
 
 	// Bullet movement component.
 	UPROPERTY( VisibleAnywhere, Category = Movement )
-	UProjectileMovementComponent* ProjectileMovementComponent;
+	class UProjectileMovementComponent* ProjectileMovementComponent;
 
 	// Function that initializes the bullet's velocity in the shoot direction.
 	UFUNCTION()
 	void FireInDirection( const FVector& ShootDirection );
 
-	// Function that is called when the projectile hits something.
-	UFUNCTION()
-	void OnHit( UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit );
+	//The damage type and damage that will be done by this bullet.
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, Category = "Damage" )
+	TSubclassOf<class UDamageType> DamageType;
+
+	//The damage dealt by this bullet.
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, Category = "Damage" )
+	float Damage;
 };
