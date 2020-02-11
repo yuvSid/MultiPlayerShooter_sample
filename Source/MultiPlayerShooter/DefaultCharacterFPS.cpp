@@ -4,10 +4,15 @@
 #include "DefaultCharacterFPS.h"
 #include "Math/UnrealMathUtility.h"
 
+#include "Engine/World.h"
+#include "TimerManager.h"
+
 // Sets default values
 ADefaultCharacterFPS::ADefaultCharacterFPS()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	bReplicates = true;
+	
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	if ( GEngine )
@@ -41,7 +46,14 @@ ADefaultCharacterFPS::ADefaultCharacterFPS()
 
 	//Initialize the player's Health
 	MaxHealth = 100.0f;
-	CurrentHealth = MaxHealth;	
+	CurrentHealth = MaxHealth;
+
+
+	//Initialize projectile class
+	BulletClass = ADefaultBullet::StaticClass();
+	//Initialize fire rate
+	FireRate = 0.25f;
+	bIsFiringWeapon = false;
 }
 
 // Called when the game starts or when spawned
@@ -80,7 +92,7 @@ void ADefaultCharacterFPS::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction( "Jump", IE_Pressed, this, &ADefaultCharacterFPS::StartJump );
 	PlayerInputComponent->BindAction( "Jump", IE_Released, this, &ADefaultCharacterFPS::StopJump );
 
-	PlayerInputComponent->BindAction( "Fire", IE_Pressed, this, &ADefaultCharacterFPS::Fire );
+	PlayerInputComponent->BindAction( "Fire", IE_Pressed, this, &ADefaultCharacterFPS::StartFire );
 }
 
 void ADefaultCharacterFPS::MoveForward( float Value )
@@ -118,7 +130,7 @@ void ADefaultCharacterFPS::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>
 void ADefaultCharacterFPS::OnHealthUpdate()
 {
 	//Client-specific functionality
-	if ( IsLocallyControlled() )
+	if ( GetLocalRole() != ROLE_SimulatedProxy )
 	{
 		FString healthMessage = FString::Printf( TEXT( "You now have %f health remaining." ), CurrentHealth );
 		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Blue, healthMessage );
@@ -131,7 +143,7 @@ void ADefaultCharacterFPS::OnHealthUpdate()
 	}
 
 	//Server-specific functionality
-	if ( Role == ROLE_Authority )
+	if ( GetLocalRole() == ROLE_Authority )
 	{
 		FString healthMessage = FString::Printf( TEXT( "%s now has %f health remaining." ), *GetFName().ToString(), CurrentHealth );
 		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Blue, healthMessage );
@@ -143,7 +155,22 @@ void ADefaultCharacterFPS::OnHealthUpdate()
 	*/
 }
 
-void ADefaultCharacterFPS::Fire()
+void ADefaultCharacterFPS::StartFire()
+{
+	if ( !bIsFiringWeapon )
+	{
+		bIsFiringWeapon = true;
+		GetWorld()->GetTimerManager().SetTimer( FiringTimer, this, &ADefaultCharacterFPS::StopFire, FireRate, false );
+		HandleFire();
+	}
+}
+
+void ADefaultCharacterFPS::StopFire()
+{
+	bIsFiringWeapon = false;
+}
+
+void ADefaultCharacterFPS::HandleFire_Implementation() //TODO add _Implementation
 {
 	// Attempt to fire a Bullet.
 	if ( BulletClass )
@@ -157,28 +184,27 @@ void ADefaultCharacterFPS::Fire()
 		FVector MuzzleLocation = CameraLocation + FTransform( CameraRotation ).TransformVector( MuzzleOffset ); //TODO change bullet start location
 		FRotator MuzzleRotation = CameraRotation;
 		// Skew the aim to be slightly upwards.
-		MuzzleRotation.Pitch += 10.0f;
-		UWorld* World = GetWorld();
-		if ( World )
+		/*MuzzleRotation.Pitch += 10.0f;*/
+		
+		
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+		// Spawn the bullet at the muzzle.
+		ADefaultBullet* Bullet = GetWorld()->SpawnActor<ADefaultBullet>( BulletClass, MuzzleLocation, MuzzleRotation, SpawnParams );
+		if ( Bullet )
 		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			SpawnParams.Instigator = Instigator;
-			// Spawn the bullet at the muzzle.
-			ADefaultBullet* Bullet = World->SpawnActor<ADefaultBullet>( BulletClass, MuzzleLocation, MuzzleRotation, SpawnParams );
-			if ( Bullet )
-			{
-				// Set the projectile's initial trajectory.
-				FVector LaunchDirection = MuzzleRotation.Vector();
-				Bullet->FireInDirection( LaunchDirection );
-			}
+			// Set the projectile's initial trajectory.
+			FVector LaunchDirection = MuzzleRotation.Vector();
+			Bullet->FireInDirection( LaunchDirection );
 		}
+		
 	}
 }
 
 void ADefaultCharacterFPS::SetCurrentHealth( float healthValue )
 {
-	if ( Role == ROLE_Authority )
+	if ( GetLocalRole() == ROLE_Authority )
 	{
 		CurrentHealth = FMath::Clamp( healthValue, 0.f, MaxHealth );
 		OnHealthUpdate();

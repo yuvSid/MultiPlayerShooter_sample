@@ -26,6 +26,12 @@ ADefaultBullet::ADefaultBullet()
 	// Set the root component to be the collision component.
 	RootComponent = CollisionComponent;
 
+	//Registering the Projectile Impact function on a Hit event.
+	if ( Role == ROLE_Authority )
+	{
+		CollisionComponent->OnComponentHit.AddDynamic( this, &ADefaultBullet::OnBulletImpact );
+	}
+
 	// Use this component to drive this bullet's movement.
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>( TEXT( "ProjectileMovementComponent" ) );
 	ProjectileMovementComponent->SetUpdatedComponent( CollisionComponent );
@@ -39,6 +45,16 @@ ADefaultBullet::ADefaultBullet()
 
 	DamageType = UDamageType::StaticClass();
 	Damage = 10.0f;
+}
+
+void ADefaultBullet::OnBulletImpact( UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit )
+{
+	if ( OtherActor )
+	{
+		UGameplayStatics::ApplyPointDamage( OtherActor, Damage, NormalImpulse, Hit, Instigator->Controller, this, DamageType );
+	}
+
+	Destroy();
 }
 
 // Function that initializes the projectile's velocity in the shoot direction.

@@ -18,7 +18,8 @@ public:
 	ADefaultBullet();
 
 protected:
-	
+	UFUNCTION( Category = "Projectile" )
+		void OnBulletImpact( UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit );
 
 public:	
 	// Sphere collision component.
