@@ -2,8 +2,18 @@
 
 
 #include "DefaultCharacterFPS.h"
-#include "Math/UnrealMathUtility.h"
 
+#include "Math/UnrealMathUtility.h"
+#include "GameFramework/Controller.h"
+#include "GameFramework/Pawn.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/Engine.h"
+#include "Engine/World.h"
+#include "Components/InputComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/PrimitiveComponent.h"
+#include "Camera/CameraComponent.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 
@@ -61,6 +71,10 @@ void ADefaultCharacterFPS::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if ( GetLocalRole() == ENetRole::ROLE_Authority )
+		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Red, FString::Printf( TEXT( "Server control" ) ) );
+	else
+		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Red, FString::Printf( TEXT( "Client control" ) ) );
 }
 
 void ADefaultCharacterFPS::OnRep_CurrentHealth()
@@ -68,55 +82,34 @@ void ADefaultCharacterFPS::OnRep_CurrentHealth()
 	OnHealthUpdate();
 }
 
-// Called every frame
-void ADefaultCharacterFPS::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 
 // Called to bind functionality to input
 void ADefaultCharacterFPS::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	// Set up "movement" bindings.
+	
 	PlayerInputComponent->BindAxis( "MoveForward", this, &ADefaultCharacterFPS::MoveForward );
 	PlayerInputComponent->BindAxis( "MoveRight", this, &ADefaultCharacterFPS::MoveRight );
-
-	// Set up "look bindings"
 	PlayerInputComponent->BindAxis( "Turn", this, &ADefaultCharacterFPS::AddControllerYawInput );
 	PlayerInputComponent->BindAxis( "LookUp", this, &ADefaultCharacterFPS::AddControllerPitchInput );
-
-	// Set up "action" bindings.
 	PlayerInputComponent->BindAction( "Jump", IE_Pressed, this, &ADefaultCharacterFPS::StartJump );
 	PlayerInputComponent->BindAction( "Jump", IE_Released, this, &ADefaultCharacterFPS::StopJump );
-
 	PlayerInputComponent->BindAction( "Fire", IE_Pressed, this, &ADefaultCharacterFPS::StartFire );
 }
 
 void ADefaultCharacterFPS::MoveForward( float Value )
 {
-	// Find out which way is "forward" and record that the player wants to move that way.
 	FVector Direction = FRotationMatrix( Controller->GetControlRotation() ).GetScaledAxis( EAxis::X );
 	AddMovementInput( Direction, Value );
 }
 void ADefaultCharacterFPS::MoveRight( float Value )
 {
-	// Find out which way is "forward" and record that the player wants to move that way.
 	FVector Direction = FRotationMatrix( Controller->GetControlRotation() ).GetScaledAxis( EAxis::Y );
 	AddMovementInput( Direction, Value );
 }
 
-void ADefaultCharacterFPS::StartJump()
-{
-	bPressedJump = true;
-}
-
-void ADefaultCharacterFPS::StopJump()
-{
-	bPressedJump = false;
-}
+void ADefaultCharacterFPS::StartJump()	{	bPressedJump = true;	}
+void ADefaultCharacterFPS::StopJump()	{	bPressedJump = false;	}
 
 // Replicated Properties
 void ADefaultCharacterFPS::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
@@ -125,6 +118,15 @@ void ADefaultCharacterFPS::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>
 
 	//Replicate current health.
 	DOREPLIFETIME( ADefaultCharacterFPS, CurrentHealth );
+}
+
+void ADefaultCharacterFPS::SetCurrentHealth( float healthValue )
+{
+	if ( GetLocalRole() == ROLE_Authority )
+	{
+		CurrentHealth = FMath::Clamp( healthValue, 0.f, MaxHealth );
+		OnHealthUpdate();
+	}
 }
 
 void ADefaultCharacterFPS::OnHealthUpdate()
@@ -153,6 +155,13 @@ void ADefaultCharacterFPS::OnHealthUpdate()
 	/*
 		Any special functionality that should occur as a result of damage or death should be placed here.
 	*/
+}
+
+float ADefaultCharacterFPS::TakeDamage( float DamageTaken, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser )
+{
+	float damageApplied = CurrentHealth - DamageTaken;
+	SetCurrentHealth( damageApplied );
+	return damageApplied;
 }
 
 void ADefaultCharacterFPS::StartFire()
@@ -202,19 +211,6 @@ void ADefaultCharacterFPS::HandleFire_Implementation() //TODO add _Implementatio
 	}
 }
 
-void ADefaultCharacterFPS::SetCurrentHealth( float healthValue )
-{
-	if ( GetLocalRole() == ROLE_Authority )
-	{
-		CurrentHealth = FMath::Clamp( healthValue, 0.f, MaxHealth );
-		OnHealthUpdate();
-	}
-}
 
-float ADefaultCharacterFPS::TakeDamage( float DamageTaken, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser )
-{
-	float damageApplied = CurrentHealth - DamageTaken;
-	SetCurrentHealth( damageApplied );
-	return damageApplied;
-}
+
 

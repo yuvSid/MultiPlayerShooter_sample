@@ -4,17 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/Controller.h"
-#include "GameFramework/Pawn.h"
-#include "Net/UnrealNetwork.h"
-#include "Engine/Engine.h"
-#include "Engine/World.h"
-#include "Components/InputComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/SkeletalMeshComponent.h"
-#include "Components/PrimitiveComponent.h"
-#include "Camera/CameraComponent.h"
-
 #include "DefaultBullet.h"
 
 #include "DefaultCharacterFPS.generated.h"
@@ -35,36 +24,29 @@ protected:
 	/** The player's maximum health. This is the highest that their health can be, and the value that their health starts at when spawned.*/
 	UPROPERTY( EditDefaultsOnly, Category = "Health" )
 	float MaxHealth;
-
 	/** The player's current health. When reduced to 0, they are considered dead.*/
 	UPROPERTY( ReplicatedUsing = OnRep_CurrentHealth )
 	float CurrentHealth;
-
 	/** RepNotify for changes made to current health.*/
 	UFUNCTION()
 	void OnRep_CurrentHealth();
-
 	//Response to health being updated. Called on the server immediately after modification, and on clients in response to a RepNotify
 	void OnHealthUpdate();
 
-	//UPROPERTY( EditDefaultsOnly, Category = "Gameplay|Bullet" )
-	//TSubclassOf<class ADefaultBullet> BulletClass;
+	UPROPERTY( EditDefaultsOnly, Category = "Gameplay|Bullet" )
+	TSubclassOf<class ADefaultBullet> BulletClass;
 
 	/** Delay between shots in seconds. Used to control fire rate for our test projectile, but also to prevent an overflow of server functions from binding SpawnProjectile directly to input.*/
 	UPROPERTY( EditDefaultsOnly, Category = "Gameplay" )
 	float FireRate;
-
 	/** If true, we are in the process of firing projectiles. */
 	bool bIsFiringWeapon;
-
 	/** Function for beginning weapon fire.*/
 	UFUNCTION( BlueprintCallable, Category = "Gameplay" )
 	void StartFire();
-
 	/** Function for ending weapon fire. Once this is called, the player can use StartFire again.*/
 	UFUNCTION( BlueprintCallable, Category = "Gameplay" )
 	void StopFire();
-
 	/** Server function for spawning projectiles.*/
 	UFUNCTION( Server, Reliable )
 	void HandleFire();
@@ -73,46 +55,31 @@ protected:
 	FTimerHandle FiringTimer;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	// Property replication
 	void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
-	// Called to bind functionality to input
+	// Setting player input controller 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	// Handles input for moving forward and backward.
 	UFUNCTION()
 	void MoveForward( float Value );
-
-	// Handles input for moving right and left.
 	UFUNCTION()
 	void MoveRight( float Value );
-
-	// Sets jump flag when key is pressed.
 	UFUNCTION()
 	void StartJump();
-
-	// Clears jump flag when key is released.
 	UFUNCTION()
 	void StopJump();	
 
 	// FPS camera.
 	UPROPERTY( VisibleAnywhere )
-	UCameraComponent* FirstPersonCamera;
+	class UCameraComponent* FirstPersonCamera;
 
 	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY( VisibleDefaultsOnly, Category = Mesh )
-	USkeletalMeshComponent* FirstPersonMesh;
+	class USkeletalMeshComponent* FirstPersonMesh;
 
 	// Gun muzzle's offset from the camera location.
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = Gameplay )
 	FVector MuzzleOffset;
-
-	// Bullet class to spawn.
-	UPROPERTY( EditDefaultsOnly, Category = Bullets )
-	TSubclassOf<class ADefaultBullet> BulletClass;
 
 	// Getter for Max Health.
 	UFUNCTION( BlueprintPure, Category = "Health" )

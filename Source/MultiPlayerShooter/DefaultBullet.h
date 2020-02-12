@@ -19,20 +19,7 @@ public:
 
 protected:
 	UFUNCTION( Category = "Projectile" )
-		void OnBulletImpact( UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit );
-
-public:	
-	// Sphere collision component.
-	UPROPERTY( VisibleDefaultsOnly, Category = Projectile )
-	class USphereComponent* CollisionComponent;
-
-	// Bullet movement component.
-	UPROPERTY( VisibleAnywhere, Category = Movement )
-	class UProjectileMovementComponent* ProjectileMovementComponent;
-
-	// Function that initializes the bullet's velocity in the shoot direction.
-	UFUNCTION()
-	void FireInDirection( const FVector& ShootDirection );
+	void OnBulletImpact( UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit );
 
 	//The damage type and damage that will be done by this bullet.
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, Category = "Damage" )
@@ -41,4 +28,19 @@ public:
 	//The damage dealt by this bullet.
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, Category = "Damage" )
 	float Damage;
+
+	// Sphere collision component.
+	UPROPERTY( VisibleDefaultsOnly, Category = Projectile )
+	class USphereComponent* CollisionComponent;
+
+	// Bullet movement component.
+	UPROPERTY( VisibleAnywhere, Category = Movement )
+	class UProjectileMovementComponent* ProjectileMovementComponent;
+
+public:	
+	// Function that initializes the bullet's velocity in the shoot direction.
+	UFUNCTION()
+	void FireInDirection( const FVector& ShootDirection );
+
+
 };

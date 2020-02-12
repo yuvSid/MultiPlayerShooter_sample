@@ -15,23 +15,18 @@
 // Sets default values
 ADefaultBullet::ADefaultBullet()
 {
-	bReplicates = true;	
+	bReplicates = true;
 	
 	// Use a sphere as a simple collision representation.
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>( TEXT( "RootComponent" ) );
-	
-	// Set the sphere's collision radius.
 	CollisionComponent->InitSphereRadius( 15.0f ); //TODO add connection with blueprint scale
 	CollisionComponent->SetCollisionProfileName( TEXT( "BlockAllDynamic" ) );
-	// Set the root component to be the collision component.
 	RootComponent = CollisionComponent;
 
 	//Registering the Projectile Impact function on a Hit event.
 	if ( Role == ROLE_Authority )
-	{
 		CollisionComponent->OnComponentHit.AddDynamic( this, &ADefaultBullet::OnBulletImpact );
-	}
-
+	
 	// Use this component to drive this bullet's movement.
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>( TEXT( "ProjectileMovementComponent" ) );
 	ProjectileMovementComponent->SetUpdatedComponent( CollisionComponent );
@@ -44,7 +39,7 @@ ADefaultBullet::ADefaultBullet()
 	InitialLifeSpan = 3.0f;
 
 	DamageType = UDamageType::StaticClass();
-	Damage = 10.0f;
+	Damage = 40.0f;
 }
 
 void ADefaultBullet::OnBulletImpact( UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit )
