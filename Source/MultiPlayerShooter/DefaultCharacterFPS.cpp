@@ -16,6 +16,7 @@
 #include "Camera/CameraComponent.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 ADefaultCharacterFPS::ADefaultCharacterFPS()
@@ -24,12 +25,6 @@ ADefaultCharacterFPS::ADefaultCharacterFPS()
 	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	if ( GEngine )
-	{
-		// Put up a debug message for five seconds. The -1 "Key" value (first argument) indicates that we will never need to update or refresh this message.
-		GEngine->AddOnScreenDebugMessage( -1, 5.0f, FColor::Red, TEXT( "We are using FPSCharacter." ) );
-	}
 
 	// Create a first person camera component.
 	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>( TEXT( "FirstPersonCamera" ) );
@@ -66,22 +61,18 @@ ADefaultCharacterFPS::ADefaultCharacterFPS()
 	bIsFiringWeapon = false;
 }
 
-// Called when the game starts or when spawned
 void ADefaultCharacterFPS::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if ( GetLocalRole() == ENetRole::ROLE_Authority )
-		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Red, FString::Printf( TEXT( "Server control" ) ) );
-	else
-		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Red, FString::Printf( TEXT( "Client control" ) ) );
+
+	if ( IsLocallyControlled() )
+		ChangeWidgetUI( StartingUIWidget );
 }
 
 void ADefaultCharacterFPS::OnRep_CurrentHealth()
 {
 	OnHealthUpdate();
 }
-
 
 // Called to bind functionality to input
 void ADefaultCharacterFPS::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -109,6 +100,7 @@ void ADefaultCharacterFPS::MoveRight( float Value )
 }
 
 void ADefaultCharacterFPS::StartJump()	{	bPressedJump = true;	}
+
 void ADefaultCharacterFPS::StopJump()	{	bPressedJump = false;	}
 
 // Replicated Properties
@@ -132,21 +124,13 @@ void ADefaultCharacterFPS::SetCurrentHealth( float healthValue )
 void ADefaultCharacterFPS::OnHealthUpdate()
 {
 	//Client-specific functionality
-	if ( GetLocalRole() != ROLE_SimulatedProxy )
-	{
-		FString healthMessage = FString::Printf( TEXT( "You now have %f health remaining." ), CurrentHealth );
-		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Blue, healthMessage );
-
-		if ( CurrentHealth <= 0 )
-		{
-			FString deathMessage = FString::Printf( TEXT( "You have been killed." ) );
-			GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Red, deathMessage );
-		}
+	if ( IsLocallyControlled() ) {
+		HealthChangeNotification( GetCurrentHealth(), GetMaxHealth() );
+		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Yellow, FString( TEXT ( "Event health Notification!" ) ) );
 	}
 
 	//Server-specific functionality
-	if ( GetLocalRole() == ROLE_Authority )
-	{
+	if ( GetLocalRole() == ROLE_Authority )	{
 		FString healthMessage = FString::Printf( TEXT( "%s now has %f health remaining." ), *GetFName().ToString(), CurrentHealth );
 		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Blue, healthMessage );
 	}
@@ -208,6 +192,20 @@ void ADefaultCharacterFPS::HandleFire_Implementation() //TODO add _Implementatio
 			Bullet->FireInDirection( LaunchDirection );
 		}
 		
+	}
+}
+
+void ADefaultCharacterFPS::ChangeWidgetUI( TSubclassOf<UUserWidget> NewUIWidgetClass )
+{
+	if ( CurrentUIWIdget != nullptr ) {
+		CurrentUIWIdget->RemoveFromViewport();
+		CurrentUIWIdget = nullptr;
+	}
+
+	if ( NewUIWidgetClass != nullptr ) {
+		CurrentUIWIdget = CreateWidget<UUserWidget>( GetWorld(), NewUIWidgetClass ); //TODO change owner if problems in multiplayer
+		if ( CurrentUIWIdget != nullptr )
+			CurrentUIWIdget->AddToViewport();
 	}
 }
 

@@ -12,6 +12,7 @@ UCLASS()
 class MULTIPLAYERSHOOTER_API AMultiPlayerShooterGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+protected:
 	virtual void StartPlay() override;
 };

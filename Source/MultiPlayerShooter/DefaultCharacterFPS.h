@@ -54,6 +54,15 @@ protected:
 	/** A timer handle used for providing the fire rate delay in-between spawns.*/
 	FTimerHandle FiringTimer;
 
+	UPROPERTY( EditAnywhere, BlueprintReadOnly, Category = "UMG Game" )
+	TSubclassOf<UUserWidget> StartingUIWidget;
+
+	UPROPERTY()
+	class UUserWidget* CurrentUIWIdget;
+
+	UFUNCTION( BlueprintCallable, Category = "UMG Game" )
+	FORCEINLINE UUserWidget* GetCurrentUIWidget() { return CurrentUIWIdget; }
+
 public:	
 	// Property replication
 	void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
@@ -89,6 +98,10 @@ public:
 	UFUNCTION( BlueprintPure, Category = "Health" )
 	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
 
+	// Event for blueprint health change
+	UFUNCTION( BlueprintImplementableEvent, Category = "Health" )
+	void HealthChangeNotification( float healthValue, float maxHealthValue );
+
 	// Setter for Current Health. Clamps the value between 0 and MaxHealth and calls OnHealthUpdate. Should only be called on the server.
 	UFUNCTION( BlueprintCallable, Category = "Health" )
 	void SetCurrentHealth( float healthValue );
@@ -96,4 +109,8 @@ public:
 	// Event for taking damage. Overridden from APawn.
 	UFUNCTION( BlueprintCallable, Category = "Health" )
 	float TakeDamage( float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser ) override;
+
+	//Change or delete at all UMG.
+	UFUNCTION( BlueprintCallable, Category = "UMG Game" )
+	void ChangeWidgetUI( TSubclassOf<UUserWidget> NewUIWidgetClass );
 };
