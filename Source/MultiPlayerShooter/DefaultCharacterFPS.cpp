@@ -114,10 +114,13 @@ void ADefaultCharacterFPS::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>
 
 void ADefaultCharacterFPS::SetCurrentHealth( float healthValue )
 {
-	if ( GetLocalRole() == ROLE_Authority )
-	{
+	if ( GetLocalRole() == ROLE_Authority )	{
 		CurrentHealth = FMath::Clamp( healthValue, 0.f, MaxHealth );
 		OnHealthUpdate();
+		if ( CurrentHealth <= 0.f ) {
+			PawnClientRestart();
+			SetCurrentHealth( MaxHealth );
+		}
 	}
 }
 
@@ -126,7 +129,6 @@ void ADefaultCharacterFPS::OnHealthUpdate()
 	//Client-specific functionality
 	if ( IsLocallyControlled() ) {
 		HealthChangeNotification( GetCurrentHealth(), GetMaxHealth() );
-		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Yellow, FString( TEXT ( "Event health Notification!" ) ) );
 	}
 
 	//Server-specific functionality
@@ -150,8 +152,7 @@ float ADefaultCharacterFPS::TakeDamage( float DamageTaken, FDamageEvent const & 
 
 void ADefaultCharacterFPS::StartFire()
 {
-	if ( !bIsFiringWeapon )
-	{
+	if ( !bIsFiringWeapon )	{
 		bIsFiringWeapon = true;
 		GetWorld()->GetTimerManager().SetTimer( FiringTimer, this, &ADefaultCharacterFPS::StopFire, FireRate, false );
 		HandleFire();
@@ -166,8 +167,7 @@ void ADefaultCharacterFPS::StopFire()
 void ADefaultCharacterFPS::HandleFire_Implementation() //TODO add _Implementation
 {
 	// Attempt to fire a Bullet.
-	if ( BulletClass )
-	{
+	if ( BulletClass ) {
 		// Get the camera transform.
 		FVector CameraLocation;
 		FRotator CameraRotation;
@@ -185,8 +185,7 @@ void ADefaultCharacterFPS::HandleFire_Implementation() //TODO add _Implementatio
 		SpawnParams.Instigator = Instigator;
 		// Spawn the bullet at the muzzle.
 		ADefaultBullet* Bullet = GetWorld()->SpawnActor<ADefaultBullet>( BulletClass, MuzzleLocation, MuzzleRotation, SpawnParams );
-		if ( Bullet )
-		{
+		if ( Bullet ) {
 			// Set the projectile's initial trajectory.
 			FVector LaunchDirection = MuzzleRotation.Vector();
 			Bullet->FireInDirection( LaunchDirection );
