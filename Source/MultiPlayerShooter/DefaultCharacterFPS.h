@@ -32,6 +32,7 @@ protected:
 	void OnRep_CurrentHealth();
 	//Response to health being updated. Called on the server immediately after modification, and on clients in response to a RepNotify
 	void OnHealthUpdate();
+	void OnCharacterDeath();
 
 	UPROPERTY( EditDefaultsOnly, Category = "Gameplay|Bullet" )
 	TSubclassOf<class ADefaultBullet> BulletClass;

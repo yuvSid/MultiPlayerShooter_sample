@@ -38,6 +38,8 @@ ADefaultCharacterFPS::ADefaultCharacterFPS()
 
 	// The owning player doesn't see the regular (third-person) body mesh.
 	GetMesh()->SetOwnerNoSee( true );
+	GetMesh()->bCastDynamicShadow = false;
+	GetMesh()->CastShadow = false;
 	
 	// Create a first person mesh component for the owning player.
 	FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>( TEXT( "FirstPersonMesh" ) );
@@ -116,11 +118,13 @@ void ADefaultCharacterFPS::SetCurrentHealth( float healthValue )
 {
 	if ( GetLocalRole() == ROLE_Authority )	{
 		CurrentHealth = FMath::Clamp( healthValue, 0.f, MaxHealth );
-		OnHealthUpdate();
-		if ( CurrentHealth <= 0.f ) {
-			PawnClientRestart();
-			SetCurrentHealth( MaxHealth );
+		if ( CurrentHealth != 0.f ) {
+			OnHealthUpdate();
+		}			
+		else {
+			OnCharacterDeath();
 		}
+		
 	}
 }
 
@@ -141,6 +145,12 @@ void ADefaultCharacterFPS::OnHealthUpdate()
 	/*
 		Any special functionality that should occur as a result of damage or death should be placed here.
 	*/
+}
+
+void ADefaultCharacterFPS::OnCharacterDeath()
+{
+	PawnClientRestart();
+	//TODO add death respawn logic
 }
 
 float ADefaultCharacterFPS::TakeDamage( float DamageTaken, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser )
