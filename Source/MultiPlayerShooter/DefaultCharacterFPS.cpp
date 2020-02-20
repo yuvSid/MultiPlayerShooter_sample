@@ -69,6 +69,12 @@ void ADefaultCharacterFPS::BeginPlay()
 
 	if ( IsLocallyControlled() )
 		ChangeWidgetUI( StartingUIWidget );
+
+	if (GetLocalRole() == ROLE_Authority) {
+		DefaultSpawnLocation = GetActorLocation();
+		DefaultSpawnRotation = GetActorRotation();
+	}
+		
 }
 
 void ADefaultCharacterFPS::OnRep_CurrentHealth()
@@ -137,8 +143,7 @@ void ADefaultCharacterFPS::OnHealthUpdate()
 
 	//Server-specific functionality
 	if ( GetLocalRole() == ROLE_Authority )	{
-		FString healthMessage = FString::Printf( TEXT( "%s now has %f health remaining." ), *GetFName().ToString(), CurrentHealth );
-		GEngine->AddOnScreenDebugMessage( -1, 5.f, FColor::Blue, healthMessage );
+		;
 	}
 
 	//Functions that occur on all machines. 
@@ -149,8 +154,13 @@ void ADefaultCharacterFPS::OnHealthUpdate()
 
 void ADefaultCharacterFPS::OnCharacterDeath()
 {
-	PawnClientRestart();
-	//TODO add death respawn logic
+	if (GetLocalRole() == ROLE_Authority) {
+		SetActorLocation( DefaultSpawnLocation );
+		GetController()->ClientSetRotation( DefaultSpawnRotation );
+		CurrentHealth = MaxHealth;
+		FString healthMessage = FString::Printf(TEXT("%s has been respawned"), *GetFName().ToString());
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+	}
 }
 
 float ADefaultCharacterFPS::TakeDamage( float DamageTaken, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser )

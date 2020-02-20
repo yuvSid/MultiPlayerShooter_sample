@@ -13,62 +13,61 @@ class MULTIPLAYERSHOOTER_API ADefaultCharacterFPS : public ACharacter
 {
 	GENERATED_BODY()
 
-public:
-	// Sets default values for this character's properties
+public:	
 	ADefaultCharacterFPS();
 
 protected:
-	// Called when the game starts or when spawned
+	
 	virtual void BeginPlay() override;
 
-	/** The player's maximum health. This is the highest that their health can be, and the value that their health starts at when spawned.*/
+	UPROPERTY( Native )
+	FVector DefaultSpawnLocation;
+	UPROPERTY(Native)
+	FRotator DefaultSpawnRotation;
+	
 	UPROPERTY( EditDefaultsOnly, Category = "Health" )
 	float MaxHealth;
-	/** The player's current health. When reduced to 0, they are considered dead.*/
+	
 	UPROPERTY( ReplicatedUsing = OnRep_CurrentHealth )
 	float CurrentHealth;
-	/** RepNotify for changes made to current health.*/
+	
 	UFUNCTION()
 	void OnRep_CurrentHealth();
-	//Response to health being updated. Called on the server immediately after modification, and on clients in response to a RepNotify
+	UFUNCTION()
 	void OnHealthUpdate();
+	UFUNCTION()
 	void OnCharacterDeath();
 
 	UPROPERTY( EditDefaultsOnly, Category = "Gameplay|Bullet" )
 	TSubclassOf<class ADefaultBullet> BulletClass;
 
-	/** Delay between shots in seconds. Used to control fire rate for our test projectile, but also to prevent an overflow of server functions from binding SpawnProjectile directly to input.*/
+	
 	UPROPERTY( EditDefaultsOnly, Category = "Gameplay" )
 	float FireRate;
-	/** If true, we are in the process of firing projectiles. */
+	UPROPERTY( Native )
+	FTimerHandle FiringTimer;
+	UPROPERTY(Native)
 	bool bIsFiringWeapon;
-	/** Function for beginning weapon fire.*/
+	
 	UFUNCTION( BlueprintCallable, Category = "Gameplay" )
 	void StartFire();
-	/** Function for ending weapon fire. Once this is called, the player can use StartFire again.*/
 	UFUNCTION( BlueprintCallable, Category = "Gameplay" )
 	void StopFire();
-	/** Server function for spawning projectiles.*/
 	UFUNCTION( Server, Reliable )
 	void HandleFire();
 
-	/** A timer handle used for providing the fire rate delay in-between spawns.*/
-	FTimerHandle FiringTimer;
+	
 
 	UPROPERTY( EditAnywhere, BlueprintReadOnly, Category = "UMG Game" )
 	TSubclassOf<UUserWidget> StartingUIWidget;
-
 	UPROPERTY()
 	class UUserWidget* CurrentUIWIdget;
-
 	UFUNCTION( BlueprintCallable, Category = "UMG Game" )
 	FORCEINLINE UUserWidget* GetCurrentUIWidget() { return CurrentUIWIdget; }
 
 public:	
-	// Property replication
 	void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
-	// Setting player input controller 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UFUNCTION()
 	void MoveForward( float Value );
@@ -79,15 +78,13 @@ public:
 	UFUNCTION()
 	void StopJump();	
 
-	// FPS camera.
+	
 	UPROPERTY( VisibleAnywhere )
 	class UCameraComponent* FirstPersonCamera;
 
-	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY( VisibleDefaultsOnly, Category = Mesh )
 	class USkeletalMeshComponent* FirstPersonMesh;
 
-	// Gun muzzle's offset from the camera location.
 	UPROPERTY( EditAnywhere, BlueprintReadWrite, Category = Gameplay )
 	FVector MuzzleOffset;
 
