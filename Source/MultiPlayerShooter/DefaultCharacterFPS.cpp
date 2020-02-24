@@ -161,6 +161,9 @@ void ADefaultCharacterFPS::OnCharacterDeath()
 		FString healthMessage = FString::Printf(TEXT("%s has been respawned"), *GetFName().ToString());
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
 	}
+	if ( IsLocallyControlled() ) {
+		DeathNotificationUI( true );
+	}		
 }
 
 float ADefaultCharacterFPS::TakeDamage( float DamageTaken, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser )
