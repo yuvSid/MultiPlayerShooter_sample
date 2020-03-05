@@ -74,13 +74,6 @@ protected:
 	UFUNCTION()
 	void StopJump();
 
-	UPROPERTY( EditAnywhere, BlueprintReadOnly, Category = "UMG Game" )
-	TSubclassOf<UUserWidget> StartingUIWidget;
-	UPROPERTY()
-	class UUserWidget* CurrentUIWIdget;
-	UFUNCTION( BlueprintCallable, Category = "UMG Game" )
-	void ChangeWidgetUI( TSubclassOf<UUserWidget> NewUIWidgetClass );	
-	
 	UPROPERTY( VisibleAnywhere )
 	class UCameraComponent* FirstPersonCamera;
 	UPROPERTY( VisibleDefaultsOnly, Category = Mesh )
@@ -102,7 +95,4 @@ public:
 	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
 	UFUNCTION( BlueprintCallable, Category = "Health" )
 	void SetCurrentHealth( float healthValue );
-
-	UFUNCTION( BlueprintCallable, Category = "UMG Game" )
-	FORCEINLINE UUserWidget* GetCurrentUIWidget() { return CurrentUIWIdget; }
 };

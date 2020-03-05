@@ -67,9 +67,6 @@ void ADefaultCharacterFPS::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if ( IsLocallyControlled() )
-		ChangeWidgetUI( StartingUIWidget );
-
 	if (GetLocalRole() == ROLE_Authority) {
 		DefaultSpawnLocation = GetActorLocation();
 		DefaultSpawnRotation = GetActorRotation();
@@ -214,20 +211,6 @@ void ADefaultCharacterFPS::HandleFire_Implementation() //TODO add _Implementatio
 			Bullet->FireInDirection( LaunchDirection );
 		}
 		
-	}
-}
-
-void ADefaultCharacterFPS::ChangeWidgetUI( TSubclassOf<UUserWidget> NewUIWidgetClass )
-{
-	if ( CurrentUIWIdget != nullptr ) {
-		CurrentUIWIdget->RemoveFromViewport();
-		CurrentUIWIdget = nullptr;
-	}
-
-	if ( NewUIWidgetClass != nullptr ) {
-		CurrentUIWIdget = CreateWidget<UUserWidget>( GetWorld(), NewUIWidgetClass ); //TODO change owner if problems in multiplayer
-		if ( CurrentUIWIdget != nullptr )
-			CurrentUIWIdget->AddToViewport();
 	}
 }
 
