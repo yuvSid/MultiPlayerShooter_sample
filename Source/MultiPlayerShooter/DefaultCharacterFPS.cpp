@@ -22,6 +22,7 @@
 ADefaultCharacterFPS::ADefaultCharacterFPS()
 {
 	bReplicates = true;
+	bReplicateMovement = true;
 	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -198,20 +199,18 @@ void ADefaultCharacterFPS::HandleFire_Implementation() //TODO add _Implementatio
 		FRotator MuzzleRotation = CameraRotation;
 		// Skew the aim to be slightly upwards.
 		/*MuzzleRotation.Pitch += 10.0f;*/
-		
-		
+
+
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = Instigator;
 		// Spawn the bullet at the muzzle.
 		ADefaultBullet* Bullet = GetWorld()->SpawnActor<ADefaultBullet>( BulletClass, MuzzleLocation, MuzzleRotation, SpawnParams );
 		if ( Bullet ) {
-			// Set the projectile's initial trajectory.
-			FVector LaunchDirection = MuzzleRotation.Vector();
-			Bullet->FireInDirection( LaunchDirection );
+			Bullet->FireInDirection( MuzzleRotation.Vector() );
 		}
-		
-	}
+
+	}	
 }
 
 

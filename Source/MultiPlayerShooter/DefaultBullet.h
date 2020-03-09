@@ -39,7 +39,7 @@ protected:
 
 public:	
 	// Function that initializes the bullet's velocity in the shoot direction.
-	UFUNCTION()
+	UFUNCTION( NetMulticast, unreliable )
 	void FireInDirection( const FVector& ShootDirection );
 
 

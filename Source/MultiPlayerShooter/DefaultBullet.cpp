@@ -53,7 +53,7 @@ void ADefaultBullet::OnBulletImpact( UPrimitiveComponent* HitComponent, AActor* 
 }
 
 // Function that initializes the projectile's velocity in the shoot direction.
-void ADefaultBullet::FireInDirection( const FVector& ShootDirection )
+void ADefaultBullet::FireInDirection_Implementation( const FVector& ShootDirection )
 {
 	ProjectileMovementComponent->Velocity = ShootDirection * ProjectileMovementComponent->InitialSpeed;
 }
