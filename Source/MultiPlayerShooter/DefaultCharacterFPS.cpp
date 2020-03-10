@@ -155,7 +155,7 @@ void ADefaultCharacterFPS::OnCharacterDeath()
 	if (GetLocalRole() == ROLE_Authority) {
 		SetActorLocation( DefaultSpawnLocation );
 		GetController()->ClientSetRotation( DefaultSpawnRotation );
-		CurrentHealth = MaxHealth;
+		SetCurrentHealth( MaxHealth );
 		FString healthMessage = FString::Printf(TEXT("%s has been respawned"), *GetFName().ToString());
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
 	}
