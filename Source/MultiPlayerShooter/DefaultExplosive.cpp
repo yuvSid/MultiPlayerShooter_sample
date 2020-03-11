@@ -10,6 +10,9 @@
 ADefaultExplosive::ADefaultExplosive()
 {
 	bReplicates = true;
+	Damage = 100.f;
+	DamageRadius = 1000.f;
+	bDamageNotScaled = true;
 
 }
 
@@ -28,11 +31,9 @@ void ADefaultExplosive::Tick(float DeltaTime)
 
 float ADefaultExplosive::TakeDamage( float DamageTaken, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser )
 {
-	if ( DamageCauser != this ) {
-		UGameplayStatics::ApplyRadialDamage( this, 80.f, GetActorLocation(), 10000.f, UDamageType::StaticClass(), TArray< AActor* >(), this, EventInstigator, true ); //TODO change constants for UPROPERTY
-		Destroy();
-	}
-
+	UGameplayStatics::ApplyRadialDamage( this, Damage, GetActorLocation(), DamageRadius, UDamageType::StaticClass(), TArray< AActor* >(), this, EventInstigator, bDamageNotScaled ); //TODO change constants for UPROPERTY
+	Destroy();
+	
 	return 0.f;
 }
 

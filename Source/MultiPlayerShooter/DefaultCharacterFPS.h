@@ -41,9 +41,9 @@ protected:
 
 
 	UFUNCTION( BlueprintImplementableEvent, Category = "Health" )
-		void HealthChangeNotification( float healthValue, float maxHealthValue );
+	void HealthChangeNotification( float healthValue, float maxHealthValue );
 	UFUNCTION( BlueprintImplementableEvent, Category = "Health" )
-		void DeathNotificationUI( bool isOn );
+	void DeathNotificationUI( bool isOn );
 
 	UPROPERTY( EditDefaultsOnly, Category = "Gameplay|Bullet" )
 	TSubclassOf<class ADefaultBullet> BulletClass;
