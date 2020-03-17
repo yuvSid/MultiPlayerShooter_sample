@@ -2,25 +2,28 @@
 
 
 #include "DefaultPlayerState.h"
+#include "Net/UnrealNetwork.h"
 
-ADefaultPlayerState::ADefaultPlayerState() 
-	: Super()
+ADefaultPlayerState::ADefaultPlayerState()
+	: APlayerState()
 {
 	KillScore = 0;
 	DeathScore = 0;
 }
 
-void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override
+void ADefaultPlayerState::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
-	Super:GetLifetimeReplicatedProps( OutLifetimeProps );
+	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
 
 	DOREPLIFETIME( ADefaultPlayerState, KillScore );
 	DOREPLIFETIME( ADefaultPlayerState, DeathScore );
 }
 
-
 void ADefaultPlayerState::OnRep_KillScore()
 {
+	if ( GetLocalRole() == ROLE_Authority ) {
+		ScoreChangeNotification();
+	}
 }
 
 void ADefaultPlayerState::OnRep_DeathScore()

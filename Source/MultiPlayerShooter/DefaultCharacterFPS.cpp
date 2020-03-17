@@ -2,6 +2,7 @@
 
 
 #include "DefaultCharacterFPS.h"
+#include "DefaultPlayerState.h"
 
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/Controller.h"
@@ -161,6 +162,7 @@ void ADefaultCharacterFPS::OnCharacterDeath( AController* EventInstigator )
 		SetCurrentHealth( MaxHealth, EventInstigator );
 		FString healthMessage = FString::Printf(TEXT("%s has been killed by %s"), *GetFName().ToString(), *EventInstigator->GetPlayerState< APlayerState >()->GetPlayerName() );
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+		EventInstigator->GetPlayerState<ADefaultPlayerState>()->IncreaseKillScore();
 	}
 	if ( IsLocallyControlled() ) {
 		DeathNotificationUI( true );

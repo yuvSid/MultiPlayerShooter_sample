@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+
 #include "DefaultPlayerState.generated.h"
+
 
 /**
  * 
@@ -16,12 +18,16 @@ class MULTIPLAYERSHOOTER_API ADefaultPlayerState : public APlayerState
 
 	ADefaultPlayerState();
 
+protected:
 	/** Player's current score. */
 	UPROPERTY( replicatedUsing = OnRep_KillScore )
-	int16 KillScore;
+	int32 KillScore;
 
 	UPROPERTY( replicatedUsing = OnRep_DeathScore )
-	int16 DeathScore;
+	int32 DeathScore;
+
+	UFUNCTION( BlueprintImplementableEvent, Category = "Score" )
+	void ScoreChangeNotification();
 
 public:
 	void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
@@ -32,4 +38,6 @@ public:
 	UFUNCTION()
 	void OnRep_DeathScore();
 
+	UFUNCTION()
+	void IncreaseKillScore() { KillScore++; }
 };
