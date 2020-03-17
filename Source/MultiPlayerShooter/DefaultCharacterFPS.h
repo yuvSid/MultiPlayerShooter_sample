@@ -25,25 +25,6 @@ protected:
 	FVector DefaultSpawnLocation;
 	UPROPERTY()
 	FRotator DefaultSpawnRotation;
-	
-	//Health propeties
-	//TODO add blueprint change of maxHealth value as gamedesign propetie
-	UPROPERTY( EditDefaultsOnly, Category = "Health" )
-	float MaxHealth;	
-	UPROPERTY( ReplicatedUsing = OnRep_CurrentHealth )
-	float CurrentHealth;	
-	UFUNCTION()
-	void OnRep_CurrentHealth();
-	UFUNCTION()
-	void OnHealthUpdate();
-	UFUNCTION()
-	void OnCharacterDeath();
-
-
-	UFUNCTION( BlueprintImplementableEvent, Category = "Health" )
-	void HealthChangeNotification( float healthValue, float maxHealthValue );
-	UFUNCTION( BlueprintImplementableEvent, Category = "Health" )
-	void DeathNotificationUI( bool isOn );
 
 	UPROPERTY( EditDefaultsOnly, Category = "Gameplay|Bullet" )
 	TSubclassOf<class ADefaultBullet> BulletClass;
@@ -86,6 +67,28 @@ public:
 
 	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
 
+protected:
+		//Health propeties
+	//TODO add blueprint change of maxHealth value as gamedesign propetie
+	UPROPERTY( EditDefaultsOnly, Category = "Health" )
+	float MaxHealth;
+	UPROPERTY( ReplicatedUsing = OnRep_CurrentHealth )
+	float CurrentHealth;
+	UFUNCTION()
+	void OnRep_CurrentHealth();
+	UFUNCTION()
+	void OnHealthUpdate();
+	UFUNCTION()
+	void OnCharacterDeath( AController* EventInstigator );
+
+	UFUNCTION( BlueprintImplementableEvent, Category = "Health" )
+	void HealthChangeNotification( float healthValue, float maxHealthValue );
+	UFUNCTION( BlueprintImplementableEvent, Category = "Health" )
+	void DeathNotificationUI( bool isOn );
+	UFUNCTION( BlueprintCallable, Category = "Health" )
+	void SetCurrentHealth( float healthValue, AController* EventInstigator );
+
+public:
 	UFUNCTION( BlueprintCallable, Category = "Health" )
 	float TakeDamage( float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser ) override;
 
@@ -93,6 +96,5 @@ public:
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 	UFUNCTION( BlueprintPure, Category = "Health" )
 	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
-	UFUNCTION( BlueprintCallable, Category = "Health" )
-	void SetCurrentHealth( float healthValue );
+
 };
