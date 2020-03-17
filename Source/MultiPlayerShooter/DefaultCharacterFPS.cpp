@@ -18,6 +18,8 @@
 #include "TimerManager.h"
 #include "Blueprint/UserWidget.h"
 
+#include "GameFramework/PlayerState.h"
+
 // Sets default values
 ADefaultCharacterFPS::ADefaultCharacterFPS()
 {
@@ -75,11 +77,6 @@ void ADefaultCharacterFPS::BeginPlay()
 		
 }
 
-void ADefaultCharacterFPS::OnRep_CurrentHealth()
-{
-	OnHealthUpdate();
-}
-
 // Called to bind functionality to input
 void ADefaultCharacterFPS::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -118,7 +115,13 @@ void ADefaultCharacterFPS::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>
 	DOREPLIFETIME( ADefaultCharacterFPS, CurrentHealth );
 }
 
-void ADefaultCharacterFPS::SetCurrentHealth( float healthValue )
+
+void ADefaultCharacterFPS::OnRep_CurrentHealth()
+{
+	OnHealthUpdate();
+}
+
+void ADefaultCharacterFPS::SetCurrentHealth( float healthValue, AController* EventInstigator )
 {
 	if ( GetLocalRole() == ROLE_Authority )	{
 		CurrentHealth = FMath::Clamp( healthValue, 0.f, MaxHealth );
@@ -126,7 +129,7 @@ void ADefaultCharacterFPS::SetCurrentHealth( float healthValue )
 			OnHealthUpdate();
 		}			
 		else {
-			OnCharacterDeath();
+			OnCharacterDeath( EventInstigator );
 		}
 		
 	}
@@ -150,13 +153,13 @@ void ADefaultCharacterFPS::OnHealthUpdate()
 	*/
 }
 
-void ADefaultCharacterFPS::OnCharacterDeath()
+void ADefaultCharacterFPS::OnCharacterDeath( AController* EventInstigator )
 {
 	if (GetLocalRole() == ROLE_Authority) {
 		SetActorLocation( DefaultSpawnLocation );
 		GetController()->ClientSetRotation( DefaultSpawnRotation );
-		SetCurrentHealth( MaxHealth );
-		FString healthMessage = FString::Printf(TEXT("%s has been respawned"), *GetFName().ToString());
+		SetCurrentHealth( MaxHealth, EventInstigator );
+		FString healthMessage = FString::Printf(TEXT("%s has been killed by %s"), *GetFName().ToString(), *EventInstigator->GetPlayerState< APlayerState >()->GetPlayerName() );
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
 	}
 	if ( IsLocallyControlled() ) {
@@ -167,7 +170,8 @@ void ADefaultCharacterFPS::OnCharacterDeath()
 float ADefaultCharacterFPS::TakeDamage( float DamageTaken, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser )
 {
 	float damageApplied = CurrentHealth - DamageTaken;
-	SetCurrentHealth( damageApplied );
+	
+	SetCurrentHealth( damageApplied, EventInstigator );
 	return damageApplied;
 }
 

@@ -6,10 +6,25 @@
 ADefaultPlayerState::ADefaultPlayerState() 
 	: Super()
 {
-	;
+	KillScore = 0;
+	DeathScore = 0;
 }
 
-void ADefaultPlayerState::OnRep_Score()
+void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override
 {
-	; //TODO event to call after player score changed on every players
+	Super:GetLifetimeReplicatedProps( OutLifetimeProps );
+
+	DOREPLIFETIME( ADefaultPlayerState, KillScore );
+	DOREPLIFETIME( ADefaultPlayerState, DeathScore );
 }
+
+
+void ADefaultPlayerState::OnRep_KillScore()
+{
+}
+
+void ADefaultPlayerState::OnRep_DeathScore()
+{
+}
+
+

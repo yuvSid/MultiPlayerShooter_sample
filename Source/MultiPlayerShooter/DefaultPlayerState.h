@@ -16,8 +16,20 @@ class MULTIPLAYERSHOOTER_API ADefaultPlayerState : public APlayerState
 
 	ADefaultPlayerState();
 
+	/** Player's current score. */
+	UPROPERTY( replicatedUsing = OnRep_KillScore )
+	int16 KillScore;
+
+	UPROPERTY( replicatedUsing = OnRep_DeathScore )
+	int16 DeathScore;
+
 public:
+	void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
+	
 	/** Replication Notification Callbacks */
-	virtual void OnRep_Score() override;
+	UFUNCTION()
+	void OnRep_KillScore();
+	UFUNCTION()
+	void OnRep_DeathScore();
 
 };
