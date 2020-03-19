@@ -24,7 +24,7 @@ ADefaultBullet::ADefaultBullet()
 	RootComponent = CollisionComponent;
 
 	//Registering the Projectile Impact function on a Hit event.
-	if ( Role == ROLE_Authority )
+	if ( GetLocalRole() == ROLE_Authority )
 		CollisionComponent->OnComponentHit.AddDynamic( this, &ADefaultBullet::OnBulletImpact );
 	
 	// Use this component to drive this bullet's movement.
@@ -46,7 +46,7 @@ void ADefaultBullet::OnBulletImpact( UPrimitiveComponent* HitComponent, AActor* 
 {
 	if ( OtherActor )
 	{
-		UGameplayStatics::ApplyPointDamage( OtherActor, Damage, NormalImpulse, Hit, Instigator->Controller, this, DamageType );
+		UGameplayStatics::ApplyPointDamage( OtherActor, Damage, NormalImpulse, Hit, GetInstigator()->Controller, this, DamageType );
 	}
 
 	Destroy();

@@ -25,7 +25,7 @@
 ADefaultCharacterFPS::ADefaultCharacterFPS()
 {
 	bReplicates = true;
-	bReplicateMovement = true;
+	SetReplicatingMovement( true );
 	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -209,7 +209,7 @@ void ADefaultCharacterFPS::HandleFire_Implementation() //TODO add _Implementatio
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
-		SpawnParams.Instigator = Instigator;
+		SpawnParams.Instigator = GetInstigator();
 		// Spawn the bullet at the muzzle.
 		ADefaultBullet* Bullet = GetWorld()->SpawnActor<ADefaultBullet>( BulletClass, MuzzleLocation, MuzzleRotation, SpawnParams );
 		if ( Bullet ) {
