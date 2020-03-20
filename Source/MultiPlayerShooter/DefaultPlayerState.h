@@ -20,12 +20,12 @@ class MULTIPLAYERSHOOTER_API ADefaultPlayerState : public APlayerState
 
 protected:
 	/** Player's current score. */
-	UPROPERTY( replicatedUsing = OnRep_KillScore )
+	UPROPERTY( ReplicatedUsing = OnRep_KillScore )
 	int32 KillScore;
 
-	UPROPERTY( replicatedUsing = OnRep_DeathScore )
+	UPROPERTY( ReplicatedUsing = OnRep_DeathScore )
 	int32 DeathScore;
-
+	
 	UFUNCTION( BlueprintImplementableEvent, Category = "Score" )
 	void ScoreChangeNotification();
 
@@ -39,5 +39,9 @@ public:
 	void OnRep_DeathScore();
 
 	UFUNCTION()
-	void IncreaseKillScore() { KillScore++; }
+	void IncreaseKillScore();
+
+	UFUNCTION( BlueprintCallable )
+	int32 GetKillScore() { return KillScore; }
+
 };

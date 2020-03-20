@@ -21,13 +21,18 @@ void ADefaultPlayerState::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>&
 
 void ADefaultPlayerState::OnRep_KillScore()
 {
-	if ( GetLocalRole() == ROLE_Authority ) {
-		ScoreChangeNotification();
-	}
 }
 
 void ADefaultPlayerState::OnRep_DeathScore()
 {
+}
+
+void ADefaultPlayerState::IncreaseKillScore()
+{ 
+	if ( GetLocalRole() == ROLE_Authority ) {
+		KillScore++;
+		ScoreChangeNotification();
+	}
 }
 
 
