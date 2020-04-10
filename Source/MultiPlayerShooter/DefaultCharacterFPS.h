@@ -43,17 +43,6 @@ protected:
 	void StopFire();
 	UFUNCTION( Server, Reliable )
 	void HandleFire();
-	
-	//Movament functions
-	//TODO add crouch
-	UFUNCTION()
-	void MoveForward( float Value );
-	UFUNCTION()
-	void MoveRight( float Value );
-	UFUNCTION()
-	void StartJump();
-	UFUNCTION()
-	void StopJump();
 
 	UPROPERTY( VisibleAnywhere )
 	class UCameraComponent* FirstPersonCamera;
@@ -89,6 +78,17 @@ protected:
 	void SetCurrentHealth( float healthValue, AController* EventInstigator );
 
 public:
+	//Movament functions
+	//TODO add crouch
+	UFUNCTION()
+	void MoveForward( float Value = 1.0f );
+	UFUNCTION()
+	void MoveRight( float Value = 1.0f );
+	UFUNCTION()
+	void StartJump();
+	UFUNCTION()
+	void StopJump();
+	
 	UFUNCTION( BlueprintCallable, Category = "Health" )
 	float TakeDamage( float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser ) override;
 
