@@ -37,10 +37,6 @@ protected:
 	FTimerHandle FiringTimer;
 	UPROPERTY()
 	bool bIsFiringWeapon;	
-	UFUNCTION( BlueprintCallable, Category = "Gameplay" )
-	void StartFire();
-	UFUNCTION( BlueprintCallable, Category = "Gameplay" )
-	void StopFire();
 	UFUNCTION( Server, Reliable )
 	void HandleFire();
 
@@ -53,8 +49,6 @@ protected:
 
 public:
 	void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
-
-	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
 
 protected:
 		//Health propeties
@@ -78,16 +72,28 @@ protected:
 	void SetCurrentHealth( float healthValue, AController* EventInstigator );
 
 public:
-	//Movament functions
-	//TODO add crouch
+	//Player input handkers
 	UFUNCTION()
-	void MoveForward( float Value = 1.0f );
+	void MoveYaw( float value = 1.0f );
 	UFUNCTION()
-	void MoveRight( float Value = 1.0f );
+	void MovePitch( float value = 1.0f );
+	UFUNCTION()
+	void MoveForward( float value = 1.0f );
+	UFUNCTION()
+	void MoveRight( float value = 1.0f );
 	UFUNCTION()
 	void StartJump();
 	UFUNCTION()
 	void StopJump();
+	UFUNCTION()
+	void StartCrouch();
+	UFUNCTION()
+	void StopCrouch();
+	UFUNCTION( BlueprintCallable, Category = "Gameplay" )
+	void StartFire();
+	UFUNCTION( BlueprintCallable, Category = "Gameplay" )
+	void StopFire();
+	
 	
 	UFUNCTION( BlueprintCallable, Category = "Health" )
 	float TakeDamage( float DamageTaken, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser ) override;

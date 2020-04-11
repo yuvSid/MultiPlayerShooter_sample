@@ -78,34 +78,29 @@ void ADefaultCharacterFPS::BeginPlay()
 		
 }
 
-// Called to bind functionality to input
-void ADefaultCharacterFPS::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	
-	PlayerInputComponent->BindAxis( "MoveForward", this, &ADefaultCharacterFPS::MoveForward );
-	PlayerInputComponent->BindAxis( "MoveRight", this, &ADefaultCharacterFPS::MoveRight );
-	PlayerInputComponent->BindAxis( "Turn", this, &ADefaultCharacterFPS::AddControllerYawInput );
-	PlayerInputComponent->BindAxis( "LookUp", this, &ADefaultCharacterFPS::AddControllerPitchInput );
-	PlayerInputComponent->BindAction( "Jump", IE_Pressed, this, &ADefaultCharacterFPS::StartJump );
-	PlayerInputComponent->BindAction( "Jump", IE_Released, this, &ADefaultCharacterFPS::StopJump );
-	PlayerInputComponent->BindAction( "Fire", IE_Pressed, this, &ADefaultCharacterFPS::StartFire );
-}
+void ADefaultCharacterFPS::MoveYaw( float value )	{	AddControllerYawInput( value );	}
 
-void ADefaultCharacterFPS::MoveForward( float Value )
+void ADefaultCharacterFPS::MovePitch( float value )	{	AddControllerPitchInput( value );	}
+
+void ADefaultCharacterFPS::MoveForward( float value )
 {
 	FVector Direction = FRotationMatrix( Controller->GetControlRotation() ).GetScaledAxis( EAxis::X );
-	AddMovementInput( Direction, Value );
+	AddMovementInput( Direction, value );
 }
-void ADefaultCharacterFPS::MoveRight( float Value )
+void ADefaultCharacterFPS::MoveRight( float value )
 {
 	FVector Direction = FRotationMatrix( Controller->GetControlRotation() ).GetScaledAxis( EAxis::Y );
-	AddMovementInput( Direction, Value );
+	AddMovementInput( Direction, value );
 }
 
 void ADefaultCharacterFPS::StartJump()	{	bPressedJump = true;	}
 
 void ADefaultCharacterFPS::StopJump()	{	bPressedJump = false;	}
+
+//TODO implement crouch animation in character BP
+void ADefaultCharacterFPS::StartCrouch()	{	bIsCrouched = true;	}
+
+void ADefaultCharacterFPS::StopCrouch()	{	bIsCrouched = false;	}
 
 // Replicated Properties
 void ADefaultCharacterFPS::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
@@ -177,6 +172,7 @@ float ADefaultCharacterFPS::TakeDamage( float DamageTaken, FDamageEvent const & 
 	return damageApplied;
 }
 
+//TODO transfer this to weapons class with different fire propeties, laser gun, automatic gun and one bullet gun like this now
 void ADefaultCharacterFPS::StartFire()
 {
 	if ( !bIsFiringWeapon )	{
