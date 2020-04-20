@@ -13,70 +13,90 @@ void ADefaultPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	InputComponent->BindAxis( "Turn", this, &ADefaultPlayerController::MoveYaw );
-	InputComponent->BindAxis( "LookUp", this, &ADefaultPlayerController::MovePitch );
-	InputComponent->BindAxis( "MoveForward", this, &ADefaultPlayerController::MoveForward );
-	InputComponent->BindAxis( "MoveRight", this, &ADefaultPlayerController::MoveRight );
-	InputComponent->BindAction( "Jump", IE_Pressed, this, &ADefaultPlayerController::StartJump );
-	InputComponent->BindAction( "Jump", IE_Released, this, &ADefaultPlayerController::StopJump );
-	InputComponent->BindAction( "Crouch", IE_Pressed, this, &ADefaultPlayerController::StartCrouch ); //TODO add Crouch to button bindings in project
-	InputComponent->BindAction( "Crouch", IE_Released, this, &ADefaultPlayerController::StopCrouch );
+	InputComponent->BindAxis( "Turn", currentControlledCharacter, &ADefaultCharacterFPS::MoveYaw );
+	InputComponent->BindAxis( "LookUp", currentControlledCharacter, &ADefaultCharacterFPS::MovePitch );
+	InputComponent->BindAxis( "MoveForward", currentControlledCharacter, &ADefaultCharacterFPS::MoveForward );
+	InputComponent->BindAxis( "MoveRight", currentControlledCharacter, &ADefaultCharacterFPS::MoveRight );
+	InputComponent->BindAction( "Jump", IE_Pressed, currentControlledCharacter, &ADefaultCharacterFPS::StartJump );
+	InputComponent->BindAction( "Jump", IE_Released, currentControlledCharacter, &ADefaultCharacterFPS::StopJump );
+	InputComponent->BindAction( "Crouch", IE_Pressed, currentControlledCharacter, &ADefaultCharacterFPS::StartCrouch ); //TODO add Crouch to button bindings in project
+	InputComponent->BindAction( "Crouch", IE_Released, currentControlledCharacter, &ADefaultCharacterFPS::StopCrouch );
 
-	InputComponent->BindAction( "Fire", IE_Pressed, this, &ADefaultPlayerController::FireWeapon ); //TODO portal this to playerinput
+	InputComponent->BindAction( "Fire", IE_Pressed, currentControlledCharacter, &ADefaultCharacterFPS::StartFire ); //TODO portal this to playerinput
 }
 
-void ADefaultPlayerController::MoveYaw( float value )
-{
-	if ( currentControlledCharacter )
-		currentControlledCharacter->MoveYaw( value );
-}
 
-void ADefaultPlayerController::MovePitch( float value )
-{
-	if ( currentControlledCharacter )
-		currentControlledCharacter->MovePitch( value );
-}
-
-void ADefaultPlayerController::MoveForward( float value )
-{
-	if ( currentControlledCharacter )
-		currentControlledCharacter->MoveForward( value );
-}
-
-void ADefaultPlayerController::MoveRight( float value )
-{
-	if ( currentControlledCharacter )
-		currentControlledCharacter->MoveRight( value );
-}
-
-void ADefaultPlayerController::StartJump()
-{
-	if ( currentControlledCharacter )
-		currentControlledCharacter->StartJump();
-}
-
-void ADefaultPlayerController::StopJump()
-{
-	if ( currentControlledCharacter )
-		currentControlledCharacter->StartJump();
-}
-
-void ADefaultPlayerController::StartCrouch()
-{
-	if ( currentControlledCharacter )
-		currentControlledCharacter->StartCrouch();
-}
-
-void ADefaultPlayerController::StopCrouch()
-{
-	if ( currentControlledCharacter )
-		currentControlledCharacter->StopCrouch();
-}
-
-void ADefaultPlayerController::FireWeapon()
-{
-	if ( currentControlledCharacter )
-		currentControlledCharacter->StartFire();
-}
+////TODO  if bind not works to changable character, uncomment this section
+//// {
+//void ADefaultPlayerController::SetupInputComponent()
+//{
+//	Super::SetupInputComponent();
+//
+//	InputComponent->BindAxis( "Turn", this, &ADefaultPlayerController::MoveYaw );
+//	InputComponent->BindAxis( "LookUp", this, &ADefaultPlayerController::MovePitch );
+//	InputComponent->BindAxis( "MoveForward", this, &ADefaultPlayerController::MoveForward );
+//	InputComponent->BindAxis( "MoveRight", this, &ADefaultPlayerController::MoveRight );
+//	InputComponent->BindAction( "Jump", IE_Pressed, this, &ADefaultPlayerController::StartJump );
+//	InputComponent->BindAction( "Jump", IE_Released, this, &ADefaultPlayerController::StopJump );
+//	InputComponent->BindAction( "Crouch", IE_Pressed, this, &ADefaultPlayerController::StartCrouch ); //TODO add Crouch to button bindings in project
+//	InputComponent->BindAction( "Crouch", IE_Released, this, &ADefaultPlayerController::StopCrouch );
+//
+//	InputComponent->BindAction( "Fire", IE_Pressed, this, &ADefaultPlayerController::FireWeapon ); //TODO portal this to playerinput
+//}
+//
+//void ADefaultPlayerController::MoveYaw( float value )
+//{
+//	if ( currentControlledCharacter )
+//		currentControlledCharacter->MoveYaw( value );
+//}
+//
+//void ADefaultPlayerController::MovePitch( float value )
+//{
+//	if ( currentControlledCharacter )
+//		currentControlledCharacter->MovePitch( value );
+//}
+//
+//void ADefaultPlayerController::MoveForward( float value )
+//{
+//	if ( currentControlledCharacter )
+//		currentControlledCharacter->MoveForward( value );
+//}
+//
+//void ADefaultPlayerController::MoveRight( float value )
+//{
+//	if ( currentControlledCharacter )
+//		currentControlledCharacter->MoveRight( value );
+//}
+//
+//void ADefaultPlayerController::StartJump()
+//{
+//	if ( currentControlledCharacter )
+//		currentControlledCharacter->StartJump();
+//}
+//
+//void ADefaultPlayerController::StopJump()
+//{
+//	if ( currentControlledCharacter )
+//		currentControlledCharacter->StartJump();
+//}
+//
+//void ADefaultPlayerController::StartCrouch()
+//{
+//	if ( currentControlledCharacter )
+//		currentControlledCharacter->StartCrouch();
+//}
+//
+//void ADefaultPlayerController::StopCrouch()
+//{
+//	if ( currentControlledCharacter )
+//		currentControlledCharacter->StopCrouch();
+//}
+//
+//void ADefaultPlayerController::FireWeapon()
+//{
+//	if ( currentControlledCharacter )
+//		currentControlledCharacter->StartFire();
+//}
+//// }
 
 
