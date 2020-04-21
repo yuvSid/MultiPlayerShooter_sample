@@ -22,6 +22,8 @@ protected:
 	/** Allows the PlayerController to set up custom input bindings. */
 	virtual void SetupInputComponent();
 
+	virtual void OnPossess( APawn* aPawn ) override;
+
 	ADefaultCharacterFPS* currentControlledCharacter;
 
 	////Movament functions

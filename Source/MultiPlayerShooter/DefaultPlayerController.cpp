@@ -25,6 +25,14 @@ void ADefaultPlayerController::SetupInputComponent()
 	InputComponent->BindAction( "Fire", IE_Pressed, currentControlledCharacter, &ADefaultCharacterFPS::StartFire ); //TODO portal this to playerinput
 }
 
+void ADefaultPlayerController::OnPossess( APawn* aPawn )
+{
+	aPawn->Controller = Cast< AController, ADefaultPlayerController >( this );
+	verifyf( aPawn->Controller != nullptr, TEXT( "Something went wrong here %s! Terminating!" ), *GetName() );
+	currentControlledCharacter = Cast< ADefaultCharacterFPS, APawn >( aPawn );
+	verifyf( currentControlledCharacter != nullptr, TEXT( "Something went here with %s! Terminating!"), *GetName() );	
+}
+
 
 ////TODO  if bind not works to changable character, uncomment this section
 //// {
