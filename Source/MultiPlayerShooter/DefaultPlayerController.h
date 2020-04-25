@@ -23,27 +23,30 @@ protected:
 	virtual void SetupInputComponent();
 
 	virtual void OnPossess( APawn* aPawn ) override;
+	
+	UFUNCTION( NetMulticast, reliable )
+	virtual void ChangeAttachedPawn();
 
 	ADefaultCharacterFPS* currentControlledCharacter;
 
-	////Movament functions
-	////TODO add crouch
-	//UFUNCTION()
-	//void MoveYaw( float value = 1.0f );
-	//UFUNCTION()
-	//void MovePitch( float value = 1.0f );
-	//UFUNCTION()
-	//void MoveForward( float value = 1.0f );
-	//UFUNCTION()
-	//void MoveRight( float value = 1.0f );
-	//UFUNCTION()
-	//void StartJump();
-	//UFUNCTION()
-	//void StopJump();
-	//UFUNCTION()
-	//void StartCrouch();
-	//UFUNCTION()
-	//void StopCrouch();
-	//UFUNCTION()
-	//void FireWeapon(); //TODO implement through parent class, it has spectator and frozen settings
+	//Movament functions
+	//TODO add crouch
+	UFUNCTION()
+	void MoveYaw( float value = 1.0f );
+	UFUNCTION()
+	void MovePitch( float value = 1.0f );
+	UFUNCTION()
+	void MoveForward( float value = 1.0f );
+	UFUNCTION()
+	void MoveRight( float value = 1.0f );
+	UFUNCTION()
+	void StartJump();
+	UFUNCTION()
+	void StopJump();
+	UFUNCTION()
+	void StartCrouch();
+	UFUNCTION()
+	void StopCrouch();
+	UFUNCTION()
+	void FireWeapon(); //TODO implement through parent class, it has spectator and frozen settings
 };
