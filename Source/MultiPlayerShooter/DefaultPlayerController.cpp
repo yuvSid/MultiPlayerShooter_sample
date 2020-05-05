@@ -9,41 +9,26 @@ ADefaultPlayerController::ADefaultPlayerController()
 	currentControlledCharacter = GetPawn< ADefaultCharacterFPS >();
 }
 
-//void ADefaultPlayerController::SetupInputComponent()
-//{
-//	Super::SetupInputComponent();
-//
-//	InputComponent->BindAxis( "Turn", currentControlledCharacter, &ADefaultCharacterFPS::MoveYaw );
-//	InputComponent->BindAxis( "LookUp", currentControlledCharacter, &ADefaultCharacterFPS::MovePitch );
-//	InputComponent->BindAxis( "MoveForward", currentControlledCharacter, &ADefaultCharacterFPS::MoveForward );
-//	InputComponent->BindAxis( "MoveRight", currentControlledCharacter, &ADefaultCharacterFPS::MoveRight );
-//	InputComponent->BindAction( "Jump", IE_Pressed, currentControlledCharacter, &ADefaultCharacterFPS::StartJump );
-//	InputComponent->BindAction( "Jump", IE_Released, currentControlledCharacter, &ADefaultCharacterFPS::StopJump );
-//	InputComponent->BindAction( "Crouch", IE_Pressed, currentControlledCharacter, &ADefaultCharacterFPS::StartCrouch ); //TODO add Crouch to button bindings in project
-//	InputComponent->BindAction( "Crouch", IE_Released, currentControlledCharacter, &ADefaultCharacterFPS::StopCrouch );
-//
-//	InputComponent->BindAction( "Fire", IE_Pressed, currentControlledCharacter, &ADefaultCharacterFPS::StartFire ); //TODO portal this to playerinput
-//}
+void ADefaultPlayerController::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
+	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
+
+	DOREPLIFETIME( ADefaultPlayerController, currentControlledCharacter );
+}
 
 void ADefaultPlayerController::OnPossess( APawn* aPawn )
 {
 	Super::OnPossess( aPawn );
-	ChangeAttachedPawn();
+	ChangeAttachedPawn( aPawn );
 }
 
-void ADefaultPlayerController::ChangeAttachedPawn_Implementation()
+void ADefaultPlayerController::ChangeAttachedPawn( APawn* aPawn )
 {
-	if ( IsLocalController() ) {
-		APawn* aPawn = GetPawn();
-		if ( !aPawn )
-			return; //TODO delete this lines
-
-		verifyf( aPawn != nullptr, TEXT( "nullptr instead of new Pawn! ChangeAttachedPawn_Implementation, %s" ), *GetName() );
-		aPawn->Controller = Cast< AController, ADefaultPlayerController >( this );
-		verifyf( aPawn->Controller != nullptr, TEXT( "Something went wrong here %s! Terminating!" ), *GetName() );
-		currentControlledCharacter = Cast< ADefaultCharacterFPS, APawn >( aPawn );
-		verifyf( currentControlledCharacter != nullptr, TEXT( "Something went here with %s! Terminating!" ), *GetName() );
-	}
+	verifyf( aPawn != nullptr, TEXT( "nullptr instead of new Pawn! ChangeAttachedPawn_Implementation, %s" ), *GetName() );
+	aPawn->Controller = Cast< AController, ADefaultPlayerController >( this );
+	verifyf( aPawn->Controller != nullptr, TEXT( "Something went wrong here %s! Terminating!" ), *GetName() );
+	currentControlledCharacter = Cast< ADefaultCharacterFPS, APawn >( aPawn );
+	verifyf( currentControlledCharacter != nullptr, TEXT( "Something went here with %s! Terminating!" ), *GetName() );
 }
 
 
