@@ -6,8 +6,6 @@
 ADefaultPlayerController::ADefaultPlayerController()
 	:Super()
 {
-	bReplicates = true;
-	bReplicateMovement = true;
 	currentControlledCharacter = GetPawn< ADefaultCharacterFPS >();
 }
 
@@ -17,22 +15,6 @@ void ADefaultPlayerController::GetLifetimeReplicatedProps( TArray<FLifetimePrope
 
 	DOREPLIFETIME( ADefaultPlayerController, currentControlledCharacter );
 }
-
-//void ADefaultPlayerController::SetupInputComponent()
-//{
-//	Super::SetupInputComponent();
-//
-//	InputComponent->BindAxis( "Turn", currentControlledCharacter, &ADefaultCharacterFPS::MoveYaw );
-//	InputComponent->BindAxis( "LookUp", currentControlledCharacter, &ADefaultCharacterFPS::MovePitch );
-//	InputComponent->BindAxis( "MoveForward", currentControlledCharacter, &ADefaultCharacterFPS::MoveForward );
-//	InputComponent->BindAxis( "MoveRight", currentControlledCharacter, &ADefaultCharacterFPS::MoveRight );
-//	InputComponent->BindAction( "Jump", IE_Pressed, currentControlledCharacter, &ADefaultCharacterFPS::StartJump );
-//	InputComponent->BindAction( "Jump", IE_Released, currentControlledCharacter, &ADefaultCharacterFPS::StopJump );
-//	InputComponent->BindAction( "Crouch", IE_Pressed, currentControlledCharacter, &ADefaultCharacterFPS::StartCrouch ); //TODO add Crouch to button bindings in project
-//	InputComponent->BindAction( "Crouch", IE_Released, currentControlledCharacter, &ADefaultCharacterFPS::StopCrouch );
-//
-//	InputComponent->BindAction( "Fire", IE_Pressed, currentControlledCharacter, &ADefaultCharacterFPS::StartFire ); //TODO portal this to playerinput
-//}
 
 void ADefaultPlayerController::OnPossess( APawn* aPawn )
 {
