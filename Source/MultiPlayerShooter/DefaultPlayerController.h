@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "DefaultCharacterFPS.h"
+#include "Net/UnrealNetwork.h"
 
 #include "DefaultPlayerController.generated.h"
 
@@ -18,15 +19,19 @@ class MULTIPLAYERSHOOTER_API ADefaultPlayerController : public APlayerController
 
 	ADefaultPlayerController();
 
+public:
+	virtual void GetLifetimeReplicatedProps( TArray< FLifetimeProperty >& OutLifetimeProps ) const override;
+
 protected:
 	/** Allows the PlayerController to set up custom input bindings. */
 	virtual void SetupInputComponent();
 
 	virtual void OnPossess( APawn* aPawn ) override;
 	
-	UFUNCTION( NetMulticast, reliable )
-	virtual void ChangeAttachedPawn();
+	UFUNCTION()
+	virtual void ChangeAttachedPawn( APawn* aPawn );
 
+	UPROPERTY( replicated )
 	ADefaultCharacterFPS* currentControlledCharacter;
 
 	//Movament functions

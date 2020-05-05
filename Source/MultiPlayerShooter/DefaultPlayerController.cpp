@@ -6,7 +6,16 @@
 ADefaultPlayerController::ADefaultPlayerController()
 	:Super()
 {
+	bReplicates = true;
+	bReplicateMovement = true;
 	currentControlledCharacter = GetPawn< ADefaultCharacterFPS >();
+}
+
+void ADefaultPlayerController::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
+	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
+
+	DOREPLIFETIME( ADefaultPlayerController, currentControlledCharacter );
 }
 
 //void ADefaultPlayerController::SetupInputComponent()
@@ -28,22 +37,16 @@ ADefaultPlayerController::ADefaultPlayerController()
 void ADefaultPlayerController::OnPossess( APawn* aPawn )
 {
 	Super::OnPossess( aPawn );
-	ChangeAttachedPawn();
+	ChangeAttachedPawn( aPawn );
 }
 
-void ADefaultPlayerController::ChangeAttachedPawn_Implementation()
+void ADefaultPlayerController::ChangeAttachedPawn( APawn* aPawn )
 {
-	if ( IsLocalController() ) {
-		APawn* aPawn = GetPawn();
-		if ( !aPawn )
-			return; //TODO delete this lines
-
-		verifyf( aPawn != nullptr, TEXT( "nullptr instead of new Pawn! ChangeAttachedPawn_Implementation, %s" ), *GetName() );
-		aPawn->Controller = Cast< AController, ADefaultPlayerController >( this );
-		verifyf( aPawn->Controller != nullptr, TEXT( "Something went wrong here %s! Terminating!" ), *GetName() );
-		currentControlledCharacter = Cast< ADefaultCharacterFPS, APawn >( aPawn );
-		verifyf( currentControlledCharacter != nullptr, TEXT( "Something went here with %s! Terminating!" ), *GetName() );
-	}
+	verifyf( aPawn != nullptr, TEXT( "nullptr instead of new Pawn! ChangeAttachedPawn_Implementation, %s" ), *GetName() );
+	aPawn->Controller = Cast< AController, ADefaultPlayerController >( this );
+	verifyf( aPawn->Controller != nullptr, TEXT( "Something went wrong here %s! Terminating!" ), *GetName() );
+	currentControlledCharacter = Cast< ADefaultCharacterFPS, APawn >( aPawn );
+	verifyf( currentControlledCharacter != nullptr, TEXT( "Something went here with %s! Terminating!" ), *GetName() );
 }
 
 
